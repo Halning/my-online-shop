@@ -13,16 +13,4 @@ export class ProductService {
   findOne(id: string): ProductEntity | null {
     return this.productRepository.findOne(id);
   }
-
-  create(product: ProductEntity): ProductEntity {
-    return this.productRepository.create(product);
-  }
-
-  update(id: string, product: ProductEntity): ProductEntity | null {
-    return this.productRepository.update(id, product);
-  }
-
-  delete(id: string): void {
-    this.productRepository.delete(id);
-  }
 }
