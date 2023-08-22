@@ -18,24 +18,24 @@ export interface OrderEntity {
     },
     comments: string,
     status: ORDER_STATUS;
-    total: number;
+    totalPrice: number;
 }
 
-const order: OrderEntity = {
-    id: 'dffd6fa8-be6b-47f6-acff-455612620ac2',
-    userId: '0fe36d16-49bc-4aab-a227-f84df899a6cb',
+export const order: OrderEntity = {
+    id: '',
+    userId: '',
     cartId: '',
-    items: cart.items,
+    items: null,
     payment: {
-        type: 'paypal',
-        address: undefined,
-        creditCard: undefined
+        "type": "paypal",
+        "address": "London",
+        "creditCard": "1234-1234-1234-1234"
     },
     delivery: {
-        type: 'post',
-        address: undefined
+        "type": "post",
+        "address": "London"
     },
-    comments: '',
-    status: 'created',
-    total: 2,
+    comments: "",
+    status: "created",
+    totalPrice: 2,
 }
