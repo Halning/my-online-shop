@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   HttpStatus,
@@ -18,9 +19,7 @@ import * as Joi from 'joi';
 
 @Controller('api/profile/cart')
 export class CartController {
-  constructor(
-    private readonly cartService: CartService,
-  ) {}
+  constructor(private readonly cartService: CartService) {}
 
   @Get()
   @UseGuards(AuthenticationGuard)
@@ -94,6 +93,22 @@ export class CartController {
     try {
       const data = await this.cartService.updateCart(userId, value);
       res.status(HttpStatus.OK).json({ data, error: null });
+    } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        error: {
+          message: 'Ooops, something went wrong',
+        },
+      });
+    }
+  }
+
+  @Delete()
+  @UseGuards(AuthenticationGuard)
+  async deleteCart(@Headers('x-user-id') userId: string, @Res() res) {
+    try {
+      const data = await this.cartService.clearCart(userId);
+      res.status(HttpStatus.OK).json({ data: { success: true }, error: null });
     } catch (error) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,

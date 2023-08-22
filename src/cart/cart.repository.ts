@@ -6,7 +6,6 @@ export class CartRepository {
   private carts: CartEntity[] = [];
 
   findOne(userId: string): CartEntity | null {
-    console.log(this.carts);
     return (
       this.carts.find((cart) => cart.userId === userId && !cart.isDeleted) ||
       null

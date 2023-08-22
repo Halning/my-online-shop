@@ -15,7 +15,15 @@ export class CartService {
     userId: string,
   ): Promise<{ cart: CartEntity; totalPrice: number }> {
     const cart = this.cartRepository.findOne(userId);
-    const totalPrice = this.calculateTotalPrice(cart);
+    let totalPrice = 0;
+    if (cart) {
+       totalPrice = this.calculateTotalPrice(cart);
+    }
+
+    if (!cart) {
+      return  null;
+    }
+
 
     const result = {
       cart,
@@ -38,6 +46,10 @@ export class CartService {
     };
 
     return result;
+  }
+
+  async clearCart(userId: string): Promise<void> {
+    this.cartRepository.softDelete(userId);
   }
 
   async createCart(
