@@ -20,29 +20,26 @@ import * as Joi from "joi";
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  // @Get()
-  // @UsePipes(new ValidationPipe({transform: true}))
-  // @UseGuards(AuthenticationGuard)
-  // async getCart(@Headers('x-user-id') userId: string, @Res() res, @Body() cart: CartEntity) {
-  //     try {
-  //         const data = await this.cartService.createCart(userId);
-  //         res.status(HttpStatus.CREATED).json({ data, error: null });
-  //     } catch (error) {
-  //         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-  //             data: null, error: {
-  //                 message: 'Ooops, something went wrong',
-  //             }
-  //         });
-  //     }
-  // }
+  @Get()
+  @UseGuards(AuthenticationGuard)
+  async getCart(@Headers('x-user-id') userId: string, @Res() res) {
+      try {
+          const data = await this.cartService.getCart(userId);
+          res.status(HttpStatus.OK).json({ data, error: null });
+      } catch (error) {
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+              data: null, error: {
+                  message: 'Ooops, something went wrong',
+              }
+          });
+      }
+  }
 
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
   @UseGuards(AuthenticationGuard)
   async createCart(
     @Headers('x-user-id') userId: string,
     @Res() res,
-    @Body() cart: CartEntity,
   ) {
     try {
       const data = await this.cartService.createCart(userId);
@@ -58,7 +55,6 @@ export class CartController {
   }
 
   @Put()
-  @UsePipes(new ValidationPipe({ transform: true }))
   @UseGuards(AuthenticationGuard)
   async updateCart(
     @Headers('x-user-id') userId: string,
