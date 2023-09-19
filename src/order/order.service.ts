@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
+import { Cart } from '../entities/cart.entity';
 import { Order } from '../entities/order.entity';
-// import { OrderRepository } from './order.repository';
 
 @Injectable()
 export class OrderService {
@@ -15,9 +15,13 @@ export class OrderService {
     return this.em.findOne(Order, id);
   }
 
-  async create(order: Order): Promise<Order> {
-    await this.em.persistAndFlush(order);
-    return order;
+  async create(
+    userId: string,
+    cart: { cart: Cart; totalPrice: number },
+  ): Promise<Order> {
+    const newOrder = { ...order, ...cart.cart, totalPrice: cart.totalPrice };
+    await this.em.persistAndFlush(newOrder);
+    return newOrder;
   }
 
   async delete(id: string): Promise<void> {
