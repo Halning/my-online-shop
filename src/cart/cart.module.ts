@@ -8,10 +8,12 @@ import { User } from '../entities/user.entity';
 import { Product } from '../entities/product.entity';
 import { Cart } from '../entities/cart.entity';
 import { CartItem } from 'src/entities/cart-item.entity';
+
 @Module({
   imports: [
     JoiPipeModule,
     MikroOrmModule.forFeature({ entities: [User, Cart, CartItem] }),
+    OrderModule
   ],
   providers: [CartService, UserService],
   controllers: [CartController],

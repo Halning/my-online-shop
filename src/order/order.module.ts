@@ -8,5 +8,6 @@ import { Order } from '../entities/order.entity';
   imports: [MikroOrmModule.forFeature({ entities: [Order] })],
   providers: [OrderService],
   controllers: [OrderController],
+    exports: [OrderService],
 })
 export class OrderModule {}
