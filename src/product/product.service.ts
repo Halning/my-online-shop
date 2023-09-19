@@ -1,28 +1,42 @@
+import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { ProductEntity } from '../entities/product.entity';
-import { ProductRepository } from './product.repository';
+import { Product } from '../entities/product.entity';
+// import { ProductRepository } from './product.repository';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(private readonly em: EntityManager) {}
 
-  findAll(): ProductEntity[] {
-    return this.productRepository.findAll();
+  async findAll(): Promise<Product[]> {
+    return this.em.find(Product, {});
   }
 
-  findOne(id: string): ProductEntity | null {
-    return this.productRepository.findOne(id);
+  async findOne(id: string): Promise<Product | null> {
+    return this.em.findOne(Product, id);
   }
 
-  create(product: ProductEntity): ProductEntity {
-    return this.productRepository.create(product);
+  async create(product: Product): Promise<Product> {
+    const newProduct = new Product();
+    Object.assign(newProduct, product);
+    await this.em.persistAndFlush(newProduct);
+    return newProduct;
   }
 
-  update(id: string, product: ProductEntity): ProductEntity | null {
-    return this.productRepository.update(id, product);
+  async update(id: string, product: Product): Promise<Product | null> {
+    const existingProduct = await this.em.findOne(Product, id);
+    if (!existingProduct) {
+      return null; // Product not found
+    }
+
+    Object.assign(existingProduct, product);
+    await this.em.persistAndFlush(existingProduct);
+    return existingProduct;
   }
 
-  delete(id: string): void {
-    this.productRepository.delete(id);
+  async delete(id: string): Promise<void> {
+    const productToDelete = await this.em.findOne(Product, id);
+    if (productToDelete) {
+      this.em.removeAndFlush(productToDelete);
+    }
   }
 }

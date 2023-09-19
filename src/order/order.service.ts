@@ -1,25 +1,29 @@
+import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { OrderEntity } from '../entities/order.entity';
-import { OrderRepository } from './order.repository';
+import { Order } from '../entities/order.entity';
+// import { OrderRepository } from './order.repository';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(private readonly em: EntityManager) {}
 
-  findAll(userId: string): OrderEntity[] {
-    return this.orderRepository.findAll(userId);
+  async findAll(userId: string): Promise<Order[]> {
+    return this.em.find(Order, { userId });
   }
 
-  findOne(id: string): OrderEntity | null {
-    return this.orderRepository.findOne(id);
+  async findOne(id: string): Promise<Order | null> {
+    return this.em.findOne(Order, id);
   }
 
-  create(order: OrderEntity): OrderEntity {
-    // Additional business logic related to creating an order can go here.
-    return this.orderRepository.create(order);
+  async create(order: Order): Promise<Order> {
+    await this.em.persistAndFlush(order);
+    return order;
   }
 
-  delete(id: string): void {
-    this.orderRepository.delete(id);
+  async delete(id: string): Promise<void> {
+    const order = await this.em.findOne(Order, id);
+    if (order) {
+      await this.em.removeAndFlush(order);
+    }
   }
 }

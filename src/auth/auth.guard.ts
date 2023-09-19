@@ -1,37 +1,42 @@
-import {CanActivate, ExecutionContext, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
-import {UserRepository} from "../user/user.repository";
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
-    constructor(private readonly userRepository: UserRepository) {
+  constructor(private readonly userService: UserService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const res = context.switchToHttp().getResponse();
+
+    const userId = request.headers['x-user-id'];
+
+    if (!userId) {
+      throw new UnauthorizedException({
+        data: null,
+        error: {
+          message: 'Header x-user-id is missing or no user with such id',
+        },
+      });
     }
 
-    async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request = context.switchToHttp().getRequest();
-        const res = context.switchToHttp().getResponse();
+    const user = this.userService.findOne(userId);
 
-        const userId = request.headers['x-user-id'];
-
-        if (!userId) {
-            throw new UnauthorizedException({
-                data: null,
-                error: {
-                    message: "Header x-user-id is missing or no user with such id"
-                }
-            });
-        }
-
-        const user = this.userRepository.findOne(userId);
-
-        if (!user) {
-            throw new NotFoundException({
-                data: null,
-                error: {
-                    message: "User not found"
-                }
-            });
-        }
-
-        return true;
+    if (!user) {
+      throw new NotFoundException({
+        data: null,
+        error: {
+          message: 'User not found',
+        },
+      });
     }
+
+    return true;
+  }
 }

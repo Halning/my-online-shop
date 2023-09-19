@@ -1,9 +1,11 @@
-import e from "express";
+import { Entity, OneToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { Cart } from './cart.entity';
 
-export interface UserEntity {
-    id: string; // uuid
-}
+@Entity()
+export class User {
+  @PrimaryKey()
+  id!: string;
 
-export const user: UserEntity = {
-    id: '0fe36d16-49bc-4aab-a227-f84df899a6cb'
+  @Property()
+  name!: string;
 }

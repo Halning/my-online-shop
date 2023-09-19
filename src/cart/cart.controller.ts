@@ -12,7 +12,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { CartEntity } from '../entities/cart.entity';
+import { Cart } from '../entities/cart.entity';
 import { AuthenticationGuard } from '../auth/auth.guard';
 import * as Joi from "joi";
 
@@ -42,12 +42,12 @@ export class CartController {
   async createCart(
     @Headers('x-user-id') userId: string,
     @Res() res,
-    @Body() cart: CartEntity,
   ) {
     try {
       const data = await this.cartService.createCart(userId);
       res.status(HttpStatus.CREATED).json({ data, error: null });
     } catch (error) {
+      console.log(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         error: {
@@ -63,7 +63,7 @@ export class CartController {
   async updateCart(
     @Headers('x-user-id') userId: string,
     @Res() res,
-    @Body() cart: CartEntity,
+    @Body() cart: Cart,
   ) {
     const schema = Joi.object({
       id: Joi.string().required(),
@@ -82,7 +82,7 @@ export class CartController {
         .required(),
     });
 
-    let value: CartEntity = null;
+    let value: Cart = null;
 
     try {
       value = await schema.validateAsync(cart);
