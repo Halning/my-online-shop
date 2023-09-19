@@ -7,10 +7,4 @@ import { ProductModule } from './product/product.module';
   providers: [],
   imports: [CartModule, OrderModule, ProductModule],
 })
-export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //     consumer
-  //         .apply(AuthGuard)
-  //         .forRoutes('*');
-  // }
-}
+export class AppModule {}

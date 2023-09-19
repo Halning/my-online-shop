@@ -1,33 +1,64 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Headers,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductEntity } from '../entities/product.entity';
+import { AuthenticationGuard } from '../auth/auth.guard';
 
 @Controller('api/products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  findAll(): ProductEntity[] {
-    return this.productService.findAll();
+  @UseGuards(AuthenticationGuard)
+  async getProductList(@Res() res) {
+    try {
+      const data = this.productService.findAll();
+      res.status(HttpStatus.OK).json({ data, error: null });
+    } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        error: {
+          message: 'Ooops, something went wrong',
+        },
+      });
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): ProductEntity | null {
-    return this.productService.findOne(id);
-  }
+  @UseGuards(AuthenticationGuard)
+  getProductById(@Param('id') id: string, @Res() res): ProductEntity | null {
+    try {
+      const data = this.productService.findOne(id);
 
-  @Post()
-  create(@Body() product: ProductEntity): ProductEntity {
-    return this.productService.create(product);
-  }
+      if (!data) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          error: {
+            message: 'No product with such id',
+          },
+        });
+        return;
+      }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() product: ProductEntity): ProductEntity | null {
-    return this.productService.update(id, product);
-  }
-
-  @Delete(':id')
-  delete(@Param('id') id: string): void {
-    this.productService.delete(id);
+      res.status(HttpStatus.OK).json({ data, error: null });
+    } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        error: {
+          message: 'Ooops, something went wrong',
+        },
+      });
+    }
   }
 }
