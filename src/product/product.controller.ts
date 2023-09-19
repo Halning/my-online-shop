@@ -1,8 +1,7 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, HttpStatus, UseGuards, Res } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { ProductEntity } from '../entities/product.entity';
-import { AuthenticationGuard } from '../auth/auth.guard';
 import { Product } from '../entities/product.entity';
+import { AuthenticationGuard } from '../auth/auth.guard';
 
 @Controller('api/products')
 export class ProductController {
@@ -26,7 +25,7 @@ export class ProductController {
 
   @Get(':id')
   @UseGuards(AuthenticationGuard)
-  async getProductById(@Param('id') id: string, @Res() res): ProductEntity | null {
+  async getProductById(@Param('id') id: string, @Res() res): Promise<Product | null> {
     try {
       const data = await this.productService.findOne(id);
 

@@ -32,7 +32,7 @@ export class CartService {
     return { cart: newCart, totalPrice: 0 };
   }
 
-  async findCart(userId: string): Promise<Cart | null> {
+  async getCart(userId: string): Promise<Cart | null> {
     return this.em.findOne(Cart, userId);
   }
 
