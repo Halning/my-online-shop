@@ -4,10 +4,12 @@ import { CartItem } from 'src/entities/cart-item.entity';
 import { User } from '../entities/user.entity';
 // import { CartRepository } from './cart.repository';
 import { Cart } from '../entities/cart.entity';
+import { OrderService } from '../order/order.service';
+import { Order } from '../entities/order.entity';
 
 @Injectable()
 export class CartService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(private readonly em: EntityManager, private readonly orderService: OrderService) {}
 
   async updateCart(userId: string, cart: Cart): Promise<{ cart: Cart; totalPrice: number }> {
     await this.em.persistAndFlush(cart);
@@ -25,7 +27,6 @@ export class CartService {
     newCart.isDeleted = false;
     newCart.items = [];
     newCart.user = await this.em.findOne(User, { id: userId });
-    console.log(newCart);
 
     await this.em.persistAndFlush(newCart);
 
@@ -68,6 +69,16 @@ export class CartService {
     for (const cartItem of cart.items) {
       result += cartItem.count * cartItem.product.price;
     }
+
+    return result;
+  }
+
+  async checkout(userId: string): Promise<{ order: Order }> {
+    const cart = await this.getCart(userId);
+    const order = this.orderService.create(userId, cart);
+    const result = {
+      order,
+    };
 
     return result;
   }
