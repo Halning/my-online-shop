@@ -17,8 +17,9 @@ export class OrderService {
 
   async create(
     userId: string,
-    cart: { cart: Cart; totalPrice: number },
+    cart: any,
   ): Promise<Order> {
+    const order = this.findOne(userId);
     const newOrder = { ...order, ...cart.cart, totalPrice: cart.totalPrice };
     await this.em.persistAndFlush(newOrder);
     return newOrder;

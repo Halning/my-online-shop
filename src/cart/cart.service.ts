@@ -73,13 +73,8 @@ export class CartService {
     return result;
   }
 
-  async checkout(userId: string): Promise<{ order: Order }> {
+  async checkout(userId: string): Promise<Order> {
     const cart = await this.getCart(userId);
-    const order = this.orderService.create(userId, cart);
-    const result = {
-      order,
-    };
-
-    return result;
+    return this.orderService.create(userId, cart);
   }
 }
