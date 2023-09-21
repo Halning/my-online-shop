@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
-import {AuthenticationGuard} from "./auth.guard";
+import { AuthenticationGuard } from './auth.guard';
 
 @Module({
-    providers: [AuthenticationGuard],
+  providers: [AuthenticationGuard],
 })
-export class ProductModule {
-}
+export class ProductModule {}

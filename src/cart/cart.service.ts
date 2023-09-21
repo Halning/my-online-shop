@@ -17,13 +17,12 @@ export class CartService {
     const cart = this.cartRepository.findOne(userId);
     let totalPrice = 0;
     if (cart) {
-       totalPrice = this.calculateTotalPrice(cart);
+      totalPrice = this.calculateTotalPrice(cart);
     }
 
     if (!cart) {
-      return  null;
+      return null;
     }
-
 
     const result = {
       cart,
