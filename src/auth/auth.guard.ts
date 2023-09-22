@@ -26,7 +26,7 @@ export class AuthenticationGuard implements CanActivate {
       });
     }
 
-    const user = this.userRepository.findOne(userId);
+    const user = await this.userRepository.findById(userId);
 
     if (!user) {
       throw new NotFoundException({

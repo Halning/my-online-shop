@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { order, OrderEntity } from '../entities/order.entity';
+import { OrderEntity } from '../entities/order.entity';
 import { OrderRepository } from './order.repository';
 import { CartEntity } from '../entities/cart.entity';
 
@@ -7,15 +7,25 @@ import { CartEntity } from '../entities/cart.entity';
 export class OrderService {
   constructor(private readonly orderRepository: OrderRepository) {}
 
-  findOne(id: string): OrderEntity | null {
-    return this.orderRepository.findOne(id);
+  async findOne(id: string): Promise<OrderEntity | null> {
+    return await this.orderRepository.findOne(id);
   }
 
-  create(
+  async create(
     userId: string,
     cart: { cart: CartEntity; totalPrice: number },
-  ): OrderEntity {
-    const newOrder = { ...order, ...cart.cart, totalPrice: cart.totalPrice };
-    return this.orderRepository.create(newOrder);
+  ): Promise<OrderEntity> {
+    const newOrder: any = {
+      userId: userId,
+      cartId: cart.cart.userId,
+      items: cart.cart.items,
+      payment: { type: '' }, // You need to define your payment and delivery details
+      delivery: { type: '', address: {} }, // You need to define your payment and delivery details
+      comments: '', // Add comments if needed
+      status: 'created',
+      total: cart.totalPrice,
+    };
+
+    return await this.orderRepository.create(newOrder);
   }
 }

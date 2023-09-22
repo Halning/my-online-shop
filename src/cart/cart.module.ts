@@ -5,9 +5,19 @@ import { CartRepository } from './cart.repository';
 import { UserRepository } from '../user/user.repository';
 import { JoiPipeModule } from 'nestjs-joi';
 import { OrderModule } from '../order/order.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { CartEntity, CartModel } from '../entities/cart.entity';
+import { CartItemEntity, CartItemModel } from '../entities/cart-item.entity';
 
 @Module({
-  imports: [JoiPipeModule, OrderModule],
+  imports: [
+    JoiPipeModule,
+    OrderModule,
+    MongooseModule.forFeature([
+      { name: CartItemEntity.name, schema: CartItemModel },
+      { name: CartEntity.name, schema: CartModel },
+    ]),
+  ],
   providers: [CartService, CartRepository, UserRepository],
   controllers: [CartController],
 })

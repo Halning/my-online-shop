@@ -6,11 +6,11 @@ import { ProductRepository } from './product.repository';
 export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  findAll(): ProductEntity[] {
+  async findAll(): Promise<ProductEntity[]> {
     return this.productRepository.findAll();
   }
 
-  findOne(id: string): ProductEntity | null {
+  async findOne(id: string): Promise<ProductEntity | null> {
     return this.productRepository.findOne(id);
   }
 }
