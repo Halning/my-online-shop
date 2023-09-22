@@ -1,16 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { OrderEntity } from '../entities/order.entity';
 
 @Injectable()
 export class OrderRepository {
-  private orders: OrderEntity[] = [];
+  constructor(
+    @InjectModel(OrderEntity.name)
+    private readonly orderModel: Model<OrderEntity>,
+  ) {}
 
-  findOne(id: string): OrderEntity | null {
-    return this.orders.find((order) => order.id === id) || null;
+  async findOne(id: string): Promise<OrderEntity | null> {
+    return this.orderModel.findById(id).exec();
   }
 
-  create(order: OrderEntity): OrderEntity {
-    this.orders.push(order);
-    return order;
+  async create(order: OrderEntity): Promise<OrderEntity> {
+    const createdOrder = new this.orderModel(order);
+    return createdOrder.save();
   }
 }

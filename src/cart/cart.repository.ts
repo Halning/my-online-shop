@@ -1,47 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { CartEntity } from '../entities/cart.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class CartRepository {
-  private carts: CartEntity[] = [];
+  constructor(
+    @InjectModel(CartEntity.name)
+    private readonly cartModel: Model<CartEntity>,
+  ) {}
 
-  findOne(userId: string): CartEntity | null {
-    return (
-      this.carts.find((cart) => cart.userId === userId && !cart.isDeleted) ||
-      null
-    );
+  async findOne(userId: string): Promise<CartEntity | null> {
+    return this.cartModel.findOne({ userId, isDeleted: false }).exec();
   }
 
-  save(cart: CartEntity): CartEntity {
-    const existingCart = this.findOne(cart.id);
-    if (existingCart) {
-      this.carts = this.carts.map((item) => {
-        if (item.userId === existingCart.userId) {
-          const newItems = existingCart.items.map((product) => {
-            if (
-              cart.items.some(
-                (value) => value.product.id === product.product.id,
-              )
-            ) {
-              return cart.items;
-            }
-
-            return product;
-          });
-          return { items: newItems, ...existingCart, ...cart };
-        }
-        return item;
-      });
-    } else {
-      this.carts.push(cart);
-    }
-    return cart;
+  async save(cart: CartEntity): Promise<CartEntity> {
+    return this.cartModel
+      .findOneAndUpdate({ userId: cart.userId, isDeleted: false }, cart, {
+        upsert: true,
+        new: true,
+      })
+      .exec();
   }
 
-  softDelete(userId: string): void {
-    const cart = this.findOne(userId);
-    if (cart) {
-      cart.isDeleted = true;
-    }
+  async softDelete(userId: string): Promise<void> {
+    await this.cartModel
+      .updateOne({ userId, isDeleted: false }, { isDeleted: true })
+      .exec();
   }
 }

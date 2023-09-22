@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { user, UserEntity } from '../entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UserRepository {
-  private users: UserEntity[] = [user];
-
-  findOne(id: string): UserEntity | null {
-    return this.users.find((user) => user.id === id) || null;
+  constructor(
+    @InjectModel(UserEntity.name) private userModel: Model<UserEntity>,
+  ) {}
+  async findById(id: string): Promise<UserEntity> {
+    return this.userModel.findById(id).exec();
   }
 }

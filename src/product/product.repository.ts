@@ -1,15 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { product, ProductEntity } from '../entities/product.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { ProductEntity } from '../entities/product.entity';
 
 @Injectable()
 export class ProductRepository {
-  private products: ProductEntity[] = [product];
+  constructor(
+    @InjectModel(ProductEntity.name)
+    private readonly productModel: Model<ProductEntity>,
+  ) {}
 
-  findAll(): ProductEntity[] {
-    return this.products;
+  async findAll(): Promise<ProductEntity[]> {
+    return this.productModel.find().exec();
   }
 
-  findOne(id: string): ProductEntity | null {
-    return this.products.find((product) => product.id === id) || null;
+  async findOne(id: string): Promise<ProductEntity | null> {
+    return this.productModel.findById(id).exec();
   }
 }
