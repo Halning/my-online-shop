@@ -1,5 +1,4 @@
-import { Entity, OneToOne, PrimaryKey, Property } from '@mikro-orm/core';
-import { Cart } from './cart.entity';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
 
 @Entity()
 export class User {

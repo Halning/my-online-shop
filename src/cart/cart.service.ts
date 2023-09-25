@@ -1,44 +1,113 @@
 import { EntityManager } from '@mikro-orm/core';
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CartItem } from 'src/entities/cart-item.entity';
-import { User } from '../entities/user.entity';
-// import { CartRepository } from './cart.repository';
 import { Cart } from '../entities/cart.entity';
 import { OrderService } from '../order/order.service';
 import { Order } from '../entities/order.entity';
+import { Product } from '../entities/product.entity';
+import { HttpException } from '@nestjs/common/exceptions/http.exception';
 
 @Injectable()
 export class CartService {
-  constructor(private readonly em: EntityManager, private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly em: EntityManager,
+  ) {}
 
-  async updateCart(userId: string, cart: Cart): Promise<{ cart: Cart; totalPrice: number }> {
-    await this.em.persistAndFlush(cart);
-    const totalPrice = this.calculateTotalPrice(cart);
+  async updateCart(
+    userId: string,
+    body: Record<string, any>,
+  ): Promise<{ cart: Cart; totalPrice: number }> {
+    const cart = await this.getCart(userId);
+
+    // Check if the cart exists
+    if (!cart) {
+      throw new NotFoundException(`Cart for userId ${userId} not found`);
+    }
+    // Create an array to store the updated cart items
+    const updatedItems = [];
+
+    for (const itemData of body.items) {
+      const product = await this.em.findOne(Product, {
+        id: itemData.productId,
+      });
+
+      if (!product) {
+        throw new NotFoundException(
+          `Product with ID ${itemData.productId} not found`,
+        );
+      }
+
+      try {
+        await this.em.nativeDelete(CartItem, { product });
+      } catch (e) {
+        throw new HttpException(`Failed`, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+
+      // Use em.assign to update the cart item with new data
+      const cartItem = this.em.assign(new CartItem(), {
+        product,
+        cart,
+        count: itemData.count,
+      });
+
+      try {
+        await this.em.persistAndFlush(cartItem);
+      } catch (e) {
+        throw new HttpException(`Failed`, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+
+      updatedItems.push(cartItem);
+    }
+
+    // Update the cart's items with the new array of items
+    cart.items = updatedItems;
+    console.dir(cart);
+
+    try {
+      await this.em.flush();
+    } catch (e) {
+      throw new HttpException(`Failed`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    const totalPrice = this.calculateTotalPrice(updatedItems);
 
     return {
-      cart,
+      cart: {
+        ...cart,
+        items: updatedItems.map((item) => {
+          return { product: item.product, count: item.count };
+        }) as any,
+      },
       totalPrice,
     };
   }
 
-  async createCart(userId: string): Promise<{ cart: Cart; totalPrice: number }> {
+  async createCart(
+    userId: string,
+  ): Promise<{ cart: Cart; totalPrice: number }> {
     const newCart = new Cart();
     newCart.userId = userId;
     newCart.isDeleted = false;
     newCart.items = [];
-    newCart.user = await this.em.findOne(User, { id: userId });
 
-    await this.em.persistAndFlush(newCart);
+    try {
+      await this.em.transactional(async (em) => {
+        em.persist(newCart);
+      });
+    } catch (e) {
+      throw new HttpException(`Failed`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     return { cart: newCart, totalPrice: 0 };
   }
 
   async getCart(userId: string): Promise<Cart | null> {
-    return this.em.findOne(Cart, userId);
+    return await this.em.findOne(Cart, { userId }, { populate: true });
   }
 
   async addToCart(userId: string, cartItem: CartItem): Promise<Cart> {
-    let cart = await this.em.findOne(Cart, userId);
+    let cart = await this.getCart(userId);
 
     if (!cart) {
       cart = new Cart();
@@ -63,10 +132,15 @@ export class CartService {
     }
   }
 
-  private calculateTotalPrice(cart: Cart): number {
+  private calculateTotalPrice(
+    updatedItems: {
+      product: Product;
+      count: number;
+    }[],
+  ): number {
     let result = 0;
 
-    for (const cartItem of cart.items) {
+    for (const cartItem of updatedItems) {
       result += cartItem.count * cartItem.product.price;
     }
 

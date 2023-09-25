@@ -39,10 +39,7 @@ export class CartController {
 
   @Post()
   @UseGuards(AuthenticationGuard)
-  async createCart(
-    @Headers('x-user-id') userId: string,
-    @Res() res,
-  ) {
+  async createCart(@Headers('x-user-id') userId: string, @Res() res) {
     try {
       const data = await this.cartService.createCart(userId);
       res.status(HttpStatus.CREATED).json({ data, error: null });
@@ -61,40 +58,41 @@ export class CartController {
   async updateCart(
     @Headers('x-user-id') userId: string,
     @Res() res,
-    @Body() cart: Cart,
+    @Body() body: Record<string, any>,
   ) {
-    const schema = Joi.object({
-      id: Joi.string().required(),
-      items: Joi.array()
-        .items(
-          Joi.object({
-            product: Joi.object({
-              id: Joi.string().required(),
-              title: Joi.string().required(),
-              description: Joi.string().required(),
-              price: Joi.number().required(),
-            }).required(),
-            count: Joi.number().required(),
-          }),
-        )
-        .required(),
-    });
-
-    let value: Cart = null;
+    // const schema = Joi.object({
+    //   id: Joi.string().required(),
+    //   items: Joi.array()
+    //     .items(
+    //       Joi.object({
+    //         product: Joi.object({
+    //           id: Joi.string().required(),
+    //           title: Joi.string().required(),
+    //           description: Joi.string().required(),
+    //           price: Joi.number().required(),
+    //         }).required(),
+    //         count: Joi.number().required(),
+    //       }),
+    //     )
+    //     .required(),
+    // });
+    //
+    // let value: Cart = null;
+    //
+    // try {
+    //   value = await schema.validateAsync(cart);
+    // } catch (error) {
+    //   res.status(HttpStatus.BAD_REQUEST).json({
+    //     data: null,
+    //     error: {
+    //       message: error?.details || 'Ooops, something went wrong',
+    //     },
+    //   });
+    // }
 
     try {
-      value = await schema.validateAsync(cart);
-    } catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).json({
-        data: null,
-        error: {
-          message: error?.details || 'Ooops, something went wrong',
-        },
-      });
-    }
-
-    try {
-      const data = await this.cartService.updateCart(userId, value);
+      const data = await this.cartService.updateCart(userId, body);
+      console.dir(data);
       res.status(HttpStatus.OK).json({ data, error: null });
     } catch (error) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

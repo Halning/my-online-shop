@@ -1,11 +1,12 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { Cart } from './cart.entity';
 import { Product } from './product.entity';
+import { v4 } from 'uuid';
 
 @Entity()
 export class CartItem {
-  @PrimaryKey({ type: 'auto' })
-  id!: string; // You can add an ID property if needed
+  @PrimaryKey({ type: 'uuid' })
+  id: string = v4();
 
   @Property()
   count!: number;
@@ -13,7 +14,6 @@ export class CartItem {
   @ManyToOne(() => Product)
   product!: Product;
 
-  // @ts-ignore
-  @ManyToOne(() => Cart, (cart) => cart.items)
-  cart!: Cart; // This property references the owning Cart entity
+  @ManyToOne(() => Cart)
+  cart?: Cart; // This property references the owning Cart entity
 }

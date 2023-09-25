@@ -7,7 +7,7 @@ async function bootstrap() {
 
   const productSeeder = app.get(ProductSeeder);
   await productSeeder.seed();
-  
+
   await app.listen(3000);
 }
 bootstrap();
