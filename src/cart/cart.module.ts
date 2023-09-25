@@ -5,15 +5,15 @@ import { JoiPipeModule } from 'nestjs-joi';
 import { UserService } from 'src/user/user.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { User } from '../entities/user.entity';
-import { Product } from '../entities/product.entity';
 import { Cart } from '../entities/cart.entity';
 import { CartItem } from '../entities/cart-item.entity';
 import { OrderModule } from '../order/order.module';
+import { Order } from '../entities/order.entity';
 
 @Module({
   imports: [
     JoiPipeModule,
-    MikroOrmModule.forFeature({ entities: [User, Cart, CartItem] }),
+    MikroOrmModule.forFeature({ entities: [User, Cart, CartItem, Order] }),
     OrderModule,
   ],
   providers: [CartService, UserService],

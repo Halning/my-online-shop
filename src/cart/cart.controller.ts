@@ -108,7 +108,7 @@ export class CartController {
   @UseGuards(AuthenticationGuard)
   async deleteCart(@Headers('x-user-id') userId: string, @Res() res) {
     try {
-      const data = await this.cartService.clearCart(userId);
+      await this.cartService.clearCart(userId);
       res.status(HttpStatus.OK).json({ data: { success: true }, error: null });
     } catch (error) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

@@ -1,34 +1,42 @@
 import { EntityManager } from '@mikro-orm/core';
-import { Injectable } from '@nestjs/common';
-import { Cart } from '../entities/cart.entity';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Order } from '../entities/order.entity';
+import { HttpException } from '@nestjs/common/exceptions/http.exception';
+import { Cart } from '../entities/cart.entity';
+import { CartItem } from '../entities/cart-item.entity';
 
 @Injectable()
 export class OrderService {
   constructor(private readonly em: EntityManager) {}
 
-  async findAll(userId: string): Promise<Order[]> {
-    return this.em.find(Order, { userId });
-  }
-
   async findOne(id: string): Promise<Order | null> {
-    return this.em.findOne(Order, id);
+    try {
+      return await this.em.findOne(Order, id);
+    } catch (e) {
+      console.log(e);
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
   }
 
-  async create(
-    userId: string,
-    cart: any,
-  ): Promise<Order> {
-    const order = this.findOne(userId);
-    const newOrder = { ...order, ...cart.cart, totalPrice: cart.totalPrice };
-    await this.em.persistAndFlush(newOrder);
-    return newOrder;
-  }
+  async create(userId: string, cart: Cart, totalPrice: number): Promise<Order> {
+    try {
+      const order = (await this.findOne(userId)) ?? new Order();
 
-  async delete(id: string): Promise<void> {
-    const order = await this.em.findOne(Order, id);
-    if (order) {
-      await this.em.removeAndFlush(order);
+      const newOrder = this.em.assign(order, {
+        total: totalPrice,
+        userId,
+        items: cart.items.map((item) => {
+          return { product: item.product, count: item.count };
+        }) as any,
+        cartId: cart.id,
+        comments: 'Parasha!',
+        status: 'created',
+      });
+      await this.em.persistAndFlush(newOrder);
+      return newOrder;
+    } catch (e) {
+      console.log(e);
+      throw new HttpException(`Failed`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

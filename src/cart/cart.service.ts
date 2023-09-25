@@ -62,7 +62,6 @@ export class CartService {
 
     // Update the cart's items with the new array of items
     cart.items = updatedItems;
-    console.dir(cart);
 
     try {
       await this.em.flush();
@@ -106,30 +105,19 @@ export class CartService {
     return await this.em.findOne(Cart, { userId }, { populate: true });
   }
 
-  async addToCart(userId: string, cartItem: CartItem): Promise<Cart> {
-    let cart = await this.getCart(userId);
-
-    if (!cart) {
-      cart = new Cart();
-      cart.userId = userId;
-      cart.isDeleted = false;
-      cart.items = [];
-    }
-
-    cart.items.push(cartItem);
-
-    await this.em.persistAndFlush(cart);
-
-    return cart;
-  }
-
   async clearCart(userId: string): Promise<void> {
-    const cart = await this.em.findOne(Cart, userId);
+    const cart = await this.em.findOne(Cart, { userId });
 
     if (cart) {
       cart.items = [];
       await this.em.persistAndFlush(cart);
     }
+  }
+
+  async checkout(userId: string): Promise<Order> {
+    const cart = await this.getCart(userId);
+    const totalPrice = this.calculateTotalPrice(cart.items);
+    return this.orderService.create(userId, cart, totalPrice);
   }
 
   private calculateTotalPrice(
@@ -145,10 +133,5 @@ export class CartService {
     }
 
     return result;
-  }
-
-  async checkout(userId: string): Promise<Order> {
-    const cart = await this.getCart(userId);
-    return this.orderService.create(userId, cart);
   }
 }
