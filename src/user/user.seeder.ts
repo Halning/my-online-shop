@@ -13,20 +13,16 @@ export class UserSeeder {
     if (existingUsers.length === 0) {
       // Create and persist sample products
       const sampleUser: User[] = [
-        {
-          name: 'Andrii',
-        },
-        {
-          name: 'HENA',
-        },
+        new User('some@ukr.net', '12345', 'admin'),
+        new User('some1@ukr.net', '5555', 'user'),
         // Add more sample products as needed
       ];
 
       for (const userData of sampleUser) {
-        const user = new User();
-        Object.assign(user, userData);
-        await this.em.persistAndFlush(user);
+        await this.em.persist(userData);
       }
+
+      await this.em.flush();
 
       console.log('Sample user seeded.');
     } else {
