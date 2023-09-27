@@ -5,14 +5,17 @@ import { OrderModule } from './order/order.module';
 import { ProductModule } from './product/product.module';
 
 import DbConfig from './mikro-orm.config';
-import { ProductSeeder } from './product/product.seeder';
-import { UserSeeder } from './user/user.seeder';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  providers: [ProductSeeder, UserSeeder],
   imports: [
     MikroOrmModule.forRoot(DbConfig),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    AuthModule,
     CartModule,
     OrderModule,
     ProductModule,

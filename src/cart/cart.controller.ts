@@ -9,13 +9,9 @@ import {
   Put,
   Res,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { Cart } from '../entities/cart.entity';
 import { AuthenticationGuard } from '../auth/auth.guard';
-import * as Joi from 'joi';
 
 @Controller('api/profile/cart')
 export class CartController {

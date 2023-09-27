@@ -20,12 +20,4 @@ export class UserService {
   async findOne(id: string): Promise<User | undefined> {
     return this.em.findOne(User, { id });
   }
-
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.findByEmail(email);
-    if (user && user.verifyPassword(password)) {
-      return user;
-    }
-    return null;
-  }
 }
