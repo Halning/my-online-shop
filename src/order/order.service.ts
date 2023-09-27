@@ -3,7 +3,6 @@ import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Order } from '../entities/order.entity';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { Cart } from '../entities/cart.entity';
-import { CartItem } from '../entities/cart-item.entity';
 
 @Injectable()
 export class OrderService {
@@ -13,7 +12,6 @@ export class OrderService {
     try {
       return await this.em.findOne(Order, id);
     } catch (e) {
-      console.log(e);
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
   }
@@ -35,7 +33,6 @@ export class OrderService {
       await this.em.persistAndFlush(newOrder);
       return newOrder;
     } catch (e) {
-      console.log(e);
       throw new HttpException(`Failed`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

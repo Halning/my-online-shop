@@ -3,11 +3,14 @@ import { AppModule } from './app.module';
 import { ProductSeeder } from './product/product.seeder';
 import { UserSeeder } from './user/user.seeder';
 import { setupSwagger } from '../swagger';
+// import { Parasha } from './auth/parasha.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   useConfiguredEnvironmentVariables();
+
+  // app.use(Parasha);
 
   const productSeeder = app.get(ProductSeeder);
   await productSeeder.seed();

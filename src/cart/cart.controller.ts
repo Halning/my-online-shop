@@ -12,8 +12,10 @@ import {
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { AuthenticationGuard } from '../auth/auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('api/profile/cart')
+@UseGuards(JwtAuthGuard)
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
