@@ -1,21 +1,42 @@
-import { Injectable } from '@nestjs/common';
-import { order, OrderEntity } from '../entities/order.entity';
-import { OrderRepository } from './order.repository';
-import { CartEntity } from '../entities/cart.entity';
+import { EntityManager } from '@mikro-orm/core';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Order } from '../entities/order.entity';
+import { HttpException } from '@nestjs/common/exceptions/http.exception';
+import { Cart } from '../entities/cart.entity';
+import { CartItem } from '../entities/cart-item.entity';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(private readonly em: EntityManager) {}
 
-  findOne(id: string): OrderEntity | null {
-    return this.orderRepository.findOne(id);
+  async findOne(id: string): Promise<Order | null> {
+    try {
+      return await this.em.findOne(Order, id);
+    } catch (e) {
+      console.log(e);
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
   }
 
-  create(
-    userId: string,
-    cart: { cart: CartEntity; totalPrice: number },
-  ): OrderEntity {
-    const newOrder = { ...order, ...cart.cart, totalPrice: cart.totalPrice };
-    return this.orderRepository.create(newOrder);
+  async create(userId: string, cart: Cart, totalPrice: number): Promise<Order> {
+    try {
+      const order = (await this.findOne(userId)) ?? new Order();
+
+      const newOrder = this.em.assign(order, {
+        total: totalPrice,
+        userId,
+        items: cart.items.map((item) => {
+          return { product: item.product, count: item.count };
+        }) as any,
+        cartId: cart.id,
+        comments: 'Parasha!',
+        status: 'created',
+      });
+      await this.em.persistAndFlush(newOrder);
+      return newOrder;
+    } catch (e) {
+      console.log(e);
+      throw new HttpException(`Failed`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

@@ -1,18 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  Headers,
-  Res,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, HttpStatus, UseGuards, Res } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { ProductEntity } from '../entities/product.entity';
+import { Product } from '../entities/product.entity';
 import { AuthenticationGuard } from '../auth/auth.guard';
 
 @Controller('api/products')
@@ -23,7 +11,7 @@ export class ProductController {
   @UseGuards(AuthenticationGuard)
   async getProductList(@Res() res) {
     try {
-      const data = this.productService.findAll();
+      const data = await this.productService.findAll();
       res.status(HttpStatus.OK).json({ data, error: null });
     } catch (error) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -37,9 +25,9 @@ export class ProductController {
 
   @Get(':id')
   @UseGuards(AuthenticationGuard)
-  getProductById(@Param('id') id: string, @Res() res): ProductEntity | null {
+  async getProductById(@Param('id') id: string, @Res() res): Promise<Product | null> {
     try {
-      const data = this.productService.findOne(id);
+      const data = await this.productService.findOne(id);
 
       if (!data) {
         res.status(HttpStatus.NOT_FOUND).json({

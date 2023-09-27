@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { OrderRepository } from './order.repository';
 import { OrderService } from './order.service';
-import { CartModule } from '../cart/cart.module';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { Order } from '../entities/order.entity';
 
 @Module({
-  providers: [OrderRepository, OrderService],
+  imports: [MikroOrmModule.forFeature({ entities: [Order] })],
+  providers: [OrderService],
   exports: [OrderService],
 })
 export class OrderModule {}

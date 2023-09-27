@@ -1,9 +1,11 @@
-import e from 'express';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { v4 } from 'uuid';
 
-export interface UserEntity {
-  id: string; // uuid
+@Entity()
+export class User {
+  @PrimaryKey({ type: 'uuid' })
+  id?: string = v4();
+
+  @Property()
+  name!: string;
 }
-
-export const user: UserEntity = {
-  id: '0fe36d16-49bc-4aab-a227-f84df899a6cb',
-};

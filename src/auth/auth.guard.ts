@@ -5,11 +5,11 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserRepository } from '../user/user.repository';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userService: UserService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -26,7 +26,7 @@ export class AuthenticationGuard implements CanActivate {
       });
     }
 
-    const user = this.userRepository.findOne(userId);
+    const user = this.userService.findOne(userId);
 
     if (!user) {
       throw new NotFoundException({

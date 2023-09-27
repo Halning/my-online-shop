@@ -1,41 +1,42 @@
-import { cart, CartItemEntity } from './cart.entity';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { CartItem } from './cart-item.entity';
+import { v4 } from 'uuid';
 
 type ORDER_STATUS = 'created' | 'completed';
 
-export interface OrderEntity {
-  id: string; // uuid
-  userId: string;
-  cartId: string;
-  items: CartItemEntity[]; // products from CartEntity
+@Entity()
+export class Order {
+  @PrimaryKey({ type: 'uuid' })
+  id: string = v4();
+
+  @Property()
+  userId!: string;
+
+  @Property()
+  cartId!: string;
+
+  @Property({ type: 'json' })
+  items: CartItem[] = [];
+
+  @Property({ type: 'json' })
   payment: {
     type: string;
     address?: any;
     creditCard?: any;
-  };
+  } = { type: '', address: {}, creditCard: {} };
+
+  @Property({ type: 'json' })
   delivery: {
     type: string;
     address: any;
-  };
-  comments: string;
-  status: ORDER_STATUS;
-  totalPrice: number;
-}
+  } = { type: '', address: {} };
 
-export const order: OrderEntity = {
-  id: '',
-  userId: '',
-  cartId: '',
-  items: null,
-  payment: {
-    type: 'paypal',
-    address: 'London',
-    creditCard: '1234-1234-1234-1234',
-  },
-  delivery: {
-    type: 'post',
-    address: 'London',
-  },
-  comments: '',
-  status: 'created',
-  totalPrice: 2,
-};
+  @Property()
+  comments!: string;
+
+  @Property()
+  status!: string;
+
+  @Property()
+  total!: number;
+}
