@@ -4,15 +4,12 @@ import {
   Controller,
   InternalServerErrorException,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterDto } from '../dto/registr.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('api/users')
-@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
