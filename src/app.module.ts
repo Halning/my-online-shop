@@ -7,6 +7,7 @@ import { ProductModule } from './product/product.module';
 import DbConfig from './mikro-orm.config';
 import { ProductSeeder } from './product/product.seeder';
 import { UserSeeder } from './user/user.seeder';
+import { UserModule } from './user/user.module';
 
 @Module({
   providers: [ProductSeeder, UserSeeder],
@@ -15,6 +16,7 @@ import { UserSeeder } from './user/user.seeder';
     CartModule,
     OrderModule,
     ProductModule,
+    UserModule,
   ],
 })
 export class AppModule {}
