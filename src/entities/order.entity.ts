@@ -2,8 +2,6 @@ import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { CartItem } from './cart-item.entity';
 import { v4 } from 'uuid';
 
-type ORDER_STATUS = 'created' | 'completed';
-
 @Entity()
 export class Order {
   @PrimaryKey({ type: 'uuid' })

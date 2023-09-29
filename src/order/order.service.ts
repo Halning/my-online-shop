@@ -3,10 +3,14 @@ import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Order } from '../entities/order.entity';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { Cart } from '../entities/cart.entity';
+import { LoggerService } from '../logger.service';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly logger: LoggerService,
+  ) {}
 
   async findOne(id: string): Promise<Order | null> {
     try {
@@ -17,6 +21,7 @@ export class OrderService {
   }
 
   async create(userId: string, cart: Cart, totalPrice: number): Promise<Order> {
+    this.logger.info('Start creating Order');
     try {
       const order = (await this.findOne(userId)) ?? new Order();
 
