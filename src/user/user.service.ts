@@ -1,27 +1,23 @@
-import { EntityManager, EntityRepository } from '@mikro-orm/core';
-import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { User } from '../entities/user.entity';
+import { RegisterDto } from '../dto/registr.dto';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User)
-    private readonly userRepository: EntityRepository<User>,
-    private readonly em: EntityManager,
-  ) {}
+  constructor(private readonly em: EntityManager) {}
+
+  async create(userDto: RegisterDto): Promise<User> {
+    const user = new User(userDto.email, userDto.password, userDto.role);
+    await this.em.persistAndFlush(user);
+    return user;
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.em.findOne(User, { email });
+  }
 
   async findOne(id: string): Promise<User | undefined> {
-    return this.userRepository.findOne(id);
-  }
-
-  async findAll(): Promise<User[]> {
-    return this.userRepository.findAll();
-  }
-
-  async create(user: User): Promise<User> {
-    this.em.persist(user);
-    await this.em.flush();
-    return user;
+    return this.em.findOne(User, { id });
   }
 }

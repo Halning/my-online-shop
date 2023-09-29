@@ -9,15 +9,13 @@ import {
   Put,
   Res,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { Cart } from '../entities/cart.entity';
 import { AuthenticationGuard } from '../auth/auth.guard';
-import * as Joi from 'joi';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('api/profile/cart')
+@UseGuards(JwtAuthGuard)
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
