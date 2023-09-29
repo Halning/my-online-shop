@@ -13,6 +13,7 @@ export class AuthenticationGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const res = context.switchToHttp().getResponse();
 
     const userId = request.headers['x-user-id'];

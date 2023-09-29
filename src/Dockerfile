@@ -1,5 +1,5 @@
 # Use a minimal base image
-FROM node:14-alpine
+FROM node:16
 
 # Set the working directory in the container
 WORKDIR ./
@@ -9,10 +9,13 @@ COPY package*.json ./
 RUN npm ci
 
 # Copy the rest of the application code
-COPY src .
+COPY .. .
 
 # Expose the port your Nest.js application is listening on (adjust as needed)
-EXPOSE 3000
+EXPOSE 3001
+
+# Set the startup command to run the "migrate" script
+# CMD ["npm", "run", "migrate"]
 
 # Start your Nest.js application
 CMD ["npm", "run", "start:dev"]

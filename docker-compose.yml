@@ -26,5 +26,5 @@ services:
       - POSTGRES_PASSWORD=password123
       - POSTGRES_DB=node_gmp
     ports:
-      - '3000:3000'  # Expose the Nest.js application port
+      - '3001:3001'  # Expose the Nest.js application port
     restart: always
