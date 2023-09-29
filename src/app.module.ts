@@ -8,6 +8,7 @@ import DbConfig from './mikro-orm.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { HealthController } from './helth.controller';
 
 @Module({
   imports: [
@@ -21,5 +22,6 @@ import { ConfigModule } from '@nestjs/config';
     ProductModule,
     UserModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
