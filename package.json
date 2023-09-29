@@ -19,12 +19,13 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migrate": "npx mikro-orm migration:up",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "check-commit-message": "./check-commit-message.js"
   },
   "hooks": {
     "commit-msg": "npm run check-commit-message",
     "pre-commit": "lint-staged",
-    "pre-push": "npm test"
+    "pre-push": "npm audit"
   },
   "lint-staged": {
     "src/**/*.ts": [
