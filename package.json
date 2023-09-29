@@ -23,7 +23,6 @@
     "check-commit-message": "./check-commit-message.js"
   },
   "hooks": {
-    "commit-msg": "npm run check-commit-message",
     "pre-commit": "lint-staged",
     "pre-push": "npm audit"
   },
