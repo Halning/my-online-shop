@@ -3,14 +3,11 @@ import { AppModule } from './app.module';
 import { ProductSeeder } from './product/product.seeder';
 import { UserSeeder } from './user/user.seeder';
 import { setupSwagger } from '../swagger';
-// import { Parasha } from './auth/parasha.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   useConfiguredEnvironmentVariables();
-
-  // app.use(Parasha);
 
   const productSeeder = app.get(ProductSeeder);
   await productSeeder.seed();
@@ -19,6 +16,15 @@ async function bootstrap() {
   await userSeeder.seed();
 
   setupSwagger(app);
+
+  const gracefulShutdown = async () => {
+    console.log('Gracefully shutting down...');
+    await app.close();
+    process.exit(0);
+  };
+
+  process.on('SIGTERM', gracefulShutdown);
+  process.on('SIGINT', gracefulShutdown);
 
   await app.listen(3000);
 }
